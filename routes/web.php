@@ -7,6 +7,9 @@ use App\Http\Controllers\UnitController;
 use App\Http\Controllers\TeamController;
 use App\Http\Controllers\MatchController;
 use App\Http\Controllers\InventoryController;
+use App\Http\Controllers\StarterController;
+use App\Http\Controllers\UnitEvolutionController;
+use App\Http\Controllers\TransmuterController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -14,7 +17,11 @@ Route::get('/', function () {
 });
 
 Route::get('/dashboard', function () {
-    return view('dashboard');
+    $user = auth()->user();
+    if ($user && !$user->hasChosenStarter()) {
+        return redirect()->route('starter.show');
+    }
+    return app(\App\Http\Controllers\DashboardController::class)();
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
@@ -35,6 +42,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/craft/essence', [CraftingController::class, 'essenceVault'])->name('craft.essence');
     Route::post('/craft/essence', [CraftingController::class, 'upgradeUnit'])->name('craft.essence.upgrade');
 
+    Route::get('/craft/transmuter', [TransmuterController::class, 'index'])->name('craft.transmuter');
+    Route::post('/craft/transmuter/{transmutationRecipe}', [TransmuterController::class, 'transmute'])->name('craft.transmuter.transmute');
+
     Route::get('/units/{forgedUnit}', [UnitController::class, 'show'])->name('units.show');
 
     Route::get('/teams', [TeamController::class, 'index'])->name('teams.index');
@@ -43,6 +53,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/teams/{team}/edit', [TeamController::class, 'edit'])->name('teams.edit');
     Route::put('/teams/{team}', [TeamController::class, 'update'])->name('teams.update');
 
+    Route::get('/units/{forgedUnit}/evolution', [UnitEvolutionController::class, 'show'])->name('units.evolution.show');
+    Route::post('/units/{forgedUnit}/evolution', [UnitEvolutionController::class, 'evolve'])->name('units.evolution.evolve');
+
     Route::get('/matches/create', [MatchController::class, 'create'])->name('matches.create');
     Route::post('/matches', [MatchController::class, 'store'])->name('matches.store');
     Route::get('/matches/{match}', [MatchController::class, 'show'])->name('matches.show');
@@ -50,6 +63,9 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/leaderboard', \App\Http\Controllers\LeaderboardController::class)->name('leaderboard.index');
     Route::get('/inventory', InventoryController::class)->name('inventory.index');
+
+    Route::get('/starter', [StarterController::class, 'show'])->name('starter.show');
+    Route::post('/starter', [StarterController::class, 'store'])->name('starter.store');
 });
 
 require __DIR__.'/auth.php';

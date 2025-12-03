@@ -15,13 +15,18 @@
                     @if (session('team_error'))
                         <div class="mb-4 rounded-md bg-red-50 p-4 text-sm text-red-800">{{ session('team_error') }}</div>
                     @endif
-                    <form method="POST" action="{{ route('teams.store') }}" class="space-y-6">
-                        @csrf
-                        @include('teams._form', ['units' => $units, 'team' => null])
-                        <div class="flex justify-end">
-                            <x-primary-button>{{ __('Save Team') }}</x-primary-button>
-                        </div>
-                    </form>
+                    @if ($units->isEmpty())
+                        <p class="text-sm text-gray-600">You need at least one forged unit to create a team.</p>
+                        <a href="{{ auth()->user()->hasChosenStarter() ? route('scan.index') : route('starter.show') }}" class="text-indigo-600 hover:text-indigo-500 text-sm font-medium mt-3 inline-block">Get a unit</a>
+                    @else
+                        <form method="POST" action="{{ route('teams.store') }}" class="space-y-6">
+                            @csrf
+                            @include('teams._form', ['units' => $units, 'team' => null])
+                            <div class="flex justify-end">
+                                <x-primary-button>{{ __('Save Team') }}</x-primary-button>
+                            </div>
+                        </form>
+                    @endif
                 </div>
             </div>
         </div>

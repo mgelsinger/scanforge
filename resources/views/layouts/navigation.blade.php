@@ -52,9 +52,14 @@
                     </x-slot>
 
                     <x-slot name="content">
-                        <x-dropdown-link :href="route('profile.edit')">
-                            {{ __('Profile') }}
-                        </x-dropdown-link>
+                @if(!Auth::user()->hasChosenStarter())
+                    <x-dropdown-link :href="route('starter.show')">
+                        {{ __('Choose Starter') }}
+                    </x-dropdown-link>
+                @endif
+                <x-dropdown-link :href="route('profile.edit')">
+                    {{ __('Profile') }}
+                </x-dropdown-link>
 
                         <!-- Authentication -->
                         <form method="POST" action="{{ route('logout') }}">
@@ -116,6 +121,11 @@
             </div>
 
             <div class="mt-3 space-y-1">
+                @if(!Auth::user()->hasChosenStarter())
+                    <x-responsive-nav-link :href="route('starter.show')" :active="request()->routeIs('starter.*')">
+                        {{ __('Choose Starter') }}
+                    </x-responsive-nav-link>
+                @endif
                 <x-responsive-nav-link :href="route('profile.edit')">
                     {{ __('Profile') }}
                 </x-responsive-nav-link>

@@ -14,6 +14,9 @@ class Material extends Model
 
     protected $casts = [
         'metadata' => 'array',
+        'quantity' => 'integer',
+        'material_type' => 'string',
+        'rarity' => 'string',
     ];
 
     public function user(): BelongsTo

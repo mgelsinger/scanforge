@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\CraftingActionRequest;
 use App\Models\Recipe;
 use App\Models\ForgedUnit;
+use App\Models\Material;
 use App\Services\CraftingService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
@@ -19,9 +20,11 @@ class CraftingController extends Controller
     public function unitFoundry(): View
     {
         $recipes = Recipe::where('station', 'unit_foundry')->get();
+        $materials = Material::where('user_id', auth()->id())->get()->keyBy('name');
 
         return view('craft.unit', [
             'recipes' => $recipes,
+            'materials' => $materials,
         ]);
     }
 
@@ -37,9 +40,11 @@ class CraftingController extends Controller
     public function gearForge(): View
     {
         $recipes = Recipe::where('station', 'gear_forge')->get();
+        $materials = Material::where('user_id', auth()->id())->get()->keyBy('name');
 
         return view('craft.gear', [
             'recipes' => $recipes,
+            'materials' => $materials,
         ]);
     }
 
@@ -56,10 +61,12 @@ class CraftingController extends Controller
     {
         $recipes = Recipe::where('station', 'essence_vault')->get();
         $units = ForgedUnit::where('user_id', auth()->id())->get();
+        $materials = Material::where('user_id', auth()->id())->get()->keyBy('name');
 
         return view('craft.essence', [
             'recipes' => $recipes,
             'units' => $units,
+            'materials' => $materials,
         ]);
     }
 

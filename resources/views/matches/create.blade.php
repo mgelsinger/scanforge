@@ -12,32 +12,37 @@
                     @if (session('match_error'))
                         <div class="rounded-md bg-red-50 p-4 text-sm text-red-800">{{ session('match_error') }}</div>
                     @endif
-                    <form method="POST" action="{{ route('matches.store') }}" class="space-y-4">
-                        @csrf
-                        <div>
-                            <label for="attacker_team_id" class="block text-sm font-medium text-gray-700">Your Team</label>
-                            <select name="attacker_team_id" id="attacker_team_id" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                                <option value="">{{ __('Select team') }}</option>
-                                @foreach ($myTeams as $team)
-                                    <option value="{{ $team->id }}">{{ $team->name }} (Rating {{ $team->rating }})</option>
-                                @endforeach
-                            </select>
-                        </div>
+                    @if($myTeams->isEmpty())
+                        <p class="text-sm text-gray-600">You need a team before you can battle.</p>
+                        <a href="{{ route('teams.index') }}" class="text-indigo-600 hover:text-indigo-500 text-sm font-medium">Go to Teams</a>
+                    @else
+                        <form method="POST" action="{{ route('matches.store') }}" class="space-y-4">
+                            @csrf
+                            <div>
+                                <label for="attacker_team_id" class="block text-sm font-medium text-gray-700">Your Team</label>
+                                <select name="attacker_team_id" id="attacker_team_id" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                                    <option value="">{{ __('Select team') }}</option>
+                                    @foreach ($myTeams as $team)
+                                        <option value="{{ $team->id }}">{{ $team->name }} (Rating {{ $team->rating }})</option>
+                                    @endforeach
+                                </select>
+                            </div>
 
-                        <div>
-                            <label for="defender_team_id" class="block text-sm font-medium text-gray-700">Opponent Team</label>
-                            <select name="defender_team_id" id="defender_team_id" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                                <option value="">{{ __('Select opponent') }}</option>
-                                @foreach ($opponents as $team)
-                                    <option value="{{ $team->id }}">{{ $team->name }} (Owner {{ $team->user->name ?? 'Unknown' }}, Rating {{ $team->rating }})</option>
-                                @endforeach
-                            </select>
-                        </div>
+                            <div>
+                                <label for="defender_team_id" class="block text-sm font-medium text-gray-700">Opponent Team</label>
+                                <select name="defender_team_id" id="defender_team_id" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                                    <option value="">{{ __('Select opponent') }}</option>
+                                    @foreach ($opponents as $team)
+                                        <option value="{{ $team->id }}">{{ $team->name }} (Owner {{ $team->user->name ?? 'Unknown' }}, Rating {{ $team->rating }})</option>
+                                    @endforeach
+                                </select>
+                            </div>
 
-                        <div class="flex justify-end">
-                            <x-primary-button>{{ __('Queue Match') }}</x-primary-button>
-                        </div>
-                    </form>
+                            <div class="flex justify-end">
+                                <x-primary-button>{{ __('Queue Match') }}</x-primary-button>
+                            </div>
+                        </form>
+                    @endif
                 </div>
             </div>
         </div>

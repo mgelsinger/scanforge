@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class ScanRequest extends FormRequest
+class TransmutationRequest extends FormRequest
 {
     public function authorize(): bool
     {
@@ -14,7 +14,7 @@ class ScanRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'upc' => ['required', 'regex:/^[0-9]{8,14}$/'],
+            'times' => ['nullable', 'integer', 'min:1', 'max:99'],
         ];
     }
 }

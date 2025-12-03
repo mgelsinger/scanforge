@@ -18,8 +18,9 @@ class TeamController extends Controller
         $teams = Team::with(['teamUnits.forgedUnit'])
             ->where('user_id', auth()->id())
             ->get();
+        $units = ForgedUnit::where('user_id', auth()->id())->get();
 
-        return view('teams.index', ['teams' => $teams]);
+        return view('teams.index', ['teams' => $teams, 'units' => $units]);
     }
 
     public function create(): View
@@ -27,6 +28,10 @@ class TeamController extends Controller
         $this->authorize('create', Team::class);
 
         $units = ForgedUnit::where('user_id', auth()->id())->get();
+
+        if ($units->isEmpty()) {
+            return view('teams.create')->with('units', $units)->with('team_error', 'You need at least one unit to form a team.');
+        }
 
         return view('teams.create', ['units' => $units]);
     }

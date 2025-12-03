@@ -28,5 +28,7 @@ class DatabaseSeeder extends Seeder
         );
 
         $this->call(RecipeSeeder::class);
+        $this->call(EvolutionSeeder::class);
+        $this->call(TransmutationRecipeSeeder::class);
     }
 }

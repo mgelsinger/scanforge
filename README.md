@@ -1,62 +1,57 @@
-ScanForge
-=========
+ScanForge v0.1
+==============
 
-Forge power from the world around you. ScanForge is a Laravel-powered scanning → crafting → autobattler RPG where UPC barcodes become materials, blueprints, and forged units. Players scan, craft, assemble teams, and run auto-battles with rating-based leaderboards.
+ScanForge is a Laravel 11 RPG prototype where players scan real-world UPCs to gather materials, craft forged units and gear, evolve and transmute resources, build teams, and auto-battle to climb a leaderboard. This repository captures the full v0.1 gameplay loop in a Blade-first UI.
 
-## Features
-- **Auth + Breeze (Blade)**
-- **Scanning System:** UPC → category (Food/Tools/Electronics/Books/Health/Toys) → materials + blueprint fragments.
-- **Inventory:** Materials (stackable), blueprints (fragment completion), fragments, crafted gear.
-- **Crafting Stations:** Unit Foundry, Gear Forge, Essence Vault (upgrades). Transactional validation of recipes, material consumption, and outputs.
-- **Units & Teams:** Forged units with stats/rarity/traits; teams up to 5 with ordered positions.
-- **Auto-Battle Simulator:** Fastest-first turn loop, dmg = atk - def (min 1), death handling, battle logs.
-- **Matches & Ratings:** Elo-like rating changes for teams and users; battle logs stored.
-- **Leaderboard:** Cached top users by rating.
-- **Policies:** Users can only access their own units/teams.
+## Feature set (v0.1)
+- Authentication via Laravel Breeze (Blade).
+- Starter selection flow that guarantees a first ForgedUnit and starter team.
+- Scanning: UPC input → category detection → materials + blueprint fragments.
+- Inventory: materials (stackable with type/rarity), blueprints, fragments, gear.
+- Crafting: Unit Foundry, Gear Forge, Essence Vault upgrades.
+- Evolution: Tier progression with stat boosts and material costs.
+- Essence Transmuter: convert surplus materials into refined ones.
+- Teams: create/edit up to 5-unit teams with positions; policies enforced.
+- Battles: queued auto-battle simulator, match logs, rating change, leaderboard.
+- Dashboard guidance and empty-state handling across major pages.
 
-## Project Structure
-- `app/Services`: `ScanService`, `CraftingService`, `BattleSimulatorService`
-- `app/Http/Controllers`: Scan, Crafting, Inventory, Unit, Team, Match, Leaderboard
-- `app/Jobs`: `ResolveMatchJob` (simulation + ratings + logs)
-- `database/migrations`: Core game entities, matches, logs, ratings
-- `database/seeders`: `RecipeSeeder`, idempotent `DatabaseSeeder`
-- `resources/views`: Blade pages for scanning, crafting, inventory, teams, battles, leaderboard
-- `tests/`: Unit + feature coverage for scanning, crafting, teams, matches, leaderboard, simulator
+## Requirements
+- PHP 8.2+ with sqlite extensions (pdo_sqlite, sqlite3), mbstring, openssl, curl.
+- Composer
+- Node/NPM (only if you need to rebuild frontend assets; shipped CSS works with Vite dev/build).
 
 ## Setup
-```powershell
-# ensure PHP via Scoop shims
-$env:PATH="$env:USERPROFILE\scoop\shims;$env:PATH"
-$env:PHPRC="$env:USERPROFILE\scoop\persist\php\cli"
-
+```bash
 composer install
-npm install
-npm run build        # or npm run dev
+cp .env.example .env
+php artisan key:generate
 php artisan migrate --seed
-php artisan serve
+# optional: npm install && npm run dev (or build) if you want to rebuild assets
+php artisan serve        # app
+php artisan queue:work   # for match resolution (or use sync driver in .env)
 ```
 
-## Key Routes (after login)
-- `/dashboard` (home)
-- `/scan` (scan form/results)
-- `/inventory`
-- `/craft/unit`, `/craft/gear`, `/craft/essence`
-- `/teams` (list/create/edit)
-- `/matches/create` (queue), `/matches/{id}`, `/matches/{id}/log`
-- `/leaderboard`
+## Gameplay loop
+1) Register/login.
+2) Choose a starter unit (auto-creates a default team).
+3) Scan UPCs to earn materials and blueprint fragments.
+4) Craft in the Unit Foundry / Gear Forge / Essence Vault.
+5) Evolve units when requirements are met.
+6) Transmute surplus materials into refined ones if needed.
+7) Build or edit teams (up to 5 units, ordered).
+8) Queue battles, view results and logs, climb the leaderboard.
 
 ## Testing
 ```bash
 php artisan test
 ```
-Notes: Warnings about deprecated PDO MySQL constants may appear with PHP 8.5; tests otherwise pass (uses sqlite in-memory).
 
-## Seeding
-```bash
-php artisan db:seed
-```
-Creates a default user if missing (`test@example.com` / `password`) and seeds base recipes.
+## Dev utilities
+- Seeders provide recipes, evolutions, transmutation rules, and a default test user (`test@example.com` / `password`).
+- Artisan helpers:
+  - `php artisan scanforge:grant-materials {userId} {materialName} {amount}`
+  - `php artisan scanforge:reset-user {userId}`
 
 ## Notes
-- Landing `/` redirects to `/dashboard`.
-- Queue worker: use `php artisan queue:work` for async match resolution (or `sync` driver to resolve immediately).
+- Running `php artisan migrate:fresh --seed` yields a database ready for the full loop once a user registers and selects a starter.
+- This codebase is feature-frozen at v0.1; larger gameplay changes should be versioned as v0.2+.

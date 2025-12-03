@@ -15,35 +15,50 @@
             @endif
 
             <div class="bg-white shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900 space-y-3">
+                <div class="p-6 text-gray-900 space-y-4">
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-sm text-gray-600">Attacker</p>
                             <p class="text-lg font-semibold text-gray-900">{{ $match->attackerTeam->name }} ({{ $match->attacker_rating_before }} → {{ $match->attacker_rating_after }})</p>
                         </div>
-                        <div>
+                        <div class="text-right">
                             <p class="text-sm text-gray-600">Defender</p>
-                            <p class="text-lg font-semibold text-gray-900 text-right">{{ $match->defenderTeam->name }} ({{ $match->defender_rating_before }} → {{ $match->defender_rating_after }})</p>
+                            <p class="text-lg font-semibold text-gray-900">{{ $match->defenderTeam->name }} ({{ $match->defender_rating_before }} → {{ $match->defender_rating_after }})</p>
                         </div>
                     </div>
 
-                    <div class="flex items-center justify-between mt-2">
+                    <div class="flex items-center justify-between">
+                        <p class="text-sm text-gray-600">Result</p>
+                        <p class="text-lg font-semibold text-gray-900">
+                            @if($match->winnerTeam)
+                                {{ $match->winnerTeam->name === $match->attackerTeam->name ? 'You won!' : 'You lost' }}
+                            @else
+                                Pending
+                            @endif
+                        </p>
+                    </div>
+
+                    <div class="flex items-center justify-between">
+                        <p class="text-sm text-gray-600">Rating change</p>
+                        <p class="text-lg font-semibold text-gray-900">
+                            {{ $match->rating_change ?? 0 }}
+                        </p>
+                    </div>
+
+                    <div class="flex items-center justify-between">
                         <p class="text-sm text-gray-600">Winner</p>
                         <p class="text-lg font-semibold text-gray-900">{{ $match->winnerTeam?->name ?? 'Pending' }}</p>
                     </div>
 
-                    <div class="flex items-center justify-between mt-2">
-                        <p class="text-sm text-gray-600">Rating Delta</p>
-                        <p class="text-lg font-semibold text-gray-900">{{ $match->rating_change }}</p>
-                    </div>
-
-                    @if ($match->battleLog)
-                        <div class="mt-4">
-                            <a href="{{ route('matches.log', $match) }}" class="text-indigo-600 hover:text-indigo-500 text-sm font-medium">View battle log →</a>
+                    <div class="flex items-center justify-between">
+                        <p class="text-sm text-gray-600">Next</p>
+                        <div class="space-x-2">
+                            <a href="{{ route('matches.create') }}" class="inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-medium text-white hover:bg-indigo-500">Queue another battle</a>
+                            @if ($match->battleLog)
+                                <a href="{{ route('matches.log', $match) }}" class="inline-flex items-center rounded-md bg-gray-100 px-3 py-2 text-sm font-medium text-gray-800 hover:bg-gray-200">View battle log</a>
+                            @endif
                         </div>
-                    @else
-                        <p class="text-sm text-gray-500">Match is queued or processing.</p>
-                    @endif
+                    </div>
                 </div>
             </div>
         </div>

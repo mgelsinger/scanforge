@@ -14,6 +14,8 @@
                 <div class="rounded-md bg-red-50 p-4 text-sm text-red-800">{{ session('craft_error') }}</div>
             @endif
 
+            @include('craft.partials.nav')
+
             <div class="bg-white shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 space-y-4">
                     <p class="text-sm text-gray-600">Craft forged units using completed blueprints and materials.</p>
@@ -21,6 +23,12 @@
                     <div class="space-y-4">
                         @forelse ($recipes as $recipe)
                             <div class="rounded border border-gray-200 p-4">
+                                @php
+                                    $hasMaterials = collect($recipe->inputs)->every(function($input) use ($materials) {
+                                        $have = $materials[$input['name']]->quantity ?? 0;
+                                        return $have >= $input['quantity'];
+                                    });
+                                @endphp
                                 <div class="flex items-center justify-between">
                                     <div>
                                         <h3 class="text-lg font-semibold text-gray-900">{{ $recipe->name }}</h3>
@@ -29,7 +37,7 @@
                                     <form method="POST" action="{{ route('craft.unit.craft') }}">
                                         @csrf
                                         <input type="hidden" name="recipe_id" value="{{ $recipe->id }}">
-                                        <x-primary-button>{{ __('Craft Unit') }}</x-primary-button>
+                                        <x-primary-button {{ $hasMaterials ? '' : 'disabled' }}>{{ $hasMaterials ? __('Craft Unit') : __('Not enough materials') }}</x-primary-button>
                                     </form>
                                 </div>
                                 <div class="mt-3 grid grid-cols-1 md:grid-cols-2 gap-3">

@@ -14,6 +14,8 @@
                 <div class="rounded-md bg-red-50 p-4 text-sm text-red-800">{{ session('craft_error') }}</div>
             @endif
 
+            @include('craft.partials.nav')
+
             <div class="bg-white shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 space-y-4">
                     <p class="text-sm text-gray-600">Infuse essence to upgrade stats on forged units.</p>
@@ -21,6 +23,12 @@
                     <div class="space-y-4">
                         @forelse ($recipes as $recipe)
                             <div class="rounded border border-gray-200 p-4 space-y-3">
+                                @php
+                                    $hasMaterials = collect($recipe->inputs)->every(function($input) use ($materials) {
+                                        $have = $materials[$input['name']]->quantity ?? 0;
+                                        return $have >= $input['quantity'];
+                                    });
+                                @endphp
                                 <div class="flex items-center justify-between">
                                     <div>
                                         <h3 class="text-lg font-semibold text-gray-900">{{ $recipe->name }}</h3>
@@ -60,7 +68,7 @@
                                         </select>
                                     </div>
                                     <div class="flex justify-end">
-                                        <x-primary-button>{{ __('Upgrade Unit') }}</x-primary-button>
+                                        <x-primary-button {{ $hasMaterials && $units->isNotEmpty() ? '' : 'disabled' }}>{{ $hasMaterials ? __('Upgrade Unit') : __('Not enough materials') }}</x-primary-button>
                                     </div>
                                 </form>
                             </div>

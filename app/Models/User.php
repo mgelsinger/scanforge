@@ -22,6 +22,7 @@ class User extends Authenticatable
         'email',
         'password',
         'rating',
+        'starter_chosen_at',
     ];
 
     /**
@@ -45,6 +46,12 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'rating' => 'integer',
+            'starter_chosen_at' => 'datetime',
         ];
+    }
+
+    public function hasChosenStarter(): bool
+    {
+        return !is_null($this->starter_chosen_at);
     }
 }

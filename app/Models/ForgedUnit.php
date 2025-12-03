@@ -17,6 +17,16 @@ class ForgedUnit extends Model
         'metadata' => 'array',
     ];
 
+    public function isMaxTier(): bool
+    {
+        return ($this->tier ?? 1) >= 2;
+    }
+
+    public function displayName(): string
+    {
+        return $this->variant_name ?: $this->name;
+    }
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
